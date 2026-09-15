@@ -2,130 +2,256 @@
 
 import { useState } from "react";
 
-type Operador = "+" | "-" | "×" | "÷";
+const SIMBOLOS = ["+", "-", "×", "÷", "(", ")"] as const;
+type Simbolo = (typeof SIMBOLOS)[number];
 
-function calcular(a: number, b: number, operador: Operador): number {
-  switch (operador) {
-    case "+":
-      return a + b;
-    case "-":
-      return a - b;
-    case "×":
-      return a * b;
-    case "÷":
-      return b === 0 ? NaN : a / b;
-  }
+function ehSimbolo(t: string | undefined): t is Simbolo {
+  return t !== undefined && (SIMBOLOS as readonly string[]).includes(t);
 }
 
-function formatarDisplay(valor: string): string {
-  if (valor === "Erro") return valor;
-  const numero = Number(valor.replace(",", "."));
-  if (Number.isNaN(numero)) return "Erro";
-  return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 8 }).format(numero);
+function precisaDeMais(t: string | undefined): boolean {
+  return t === "+" || t === "-" || t === "×" || t === "÷" || t === "(";
+}
+
+function ehOperadorBinario(t: string | undefined): boolean {
+  return t === "+" || t === "-" || t === "×" || t === "÷";
+}
+
+function paraNumero(tok: string): number {
+  return Number(tok.replace(",", "."));
+}
+
+function formatarNumeroToken(tok: string): string {
+  const negativo = tok.startsWith("-");
+  const semSinal = negativo ? tok.slice(1) : tok;
+  const [intPart, decPart] = semSinal.split(",");
+  const intFmt = (intPart || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const base = decPart !== undefined ? `${intFmt},${decPart}` : intFmt;
+  return negativo ? `-${base}` : base;
+}
+
+function formatarResultado(valor: number): string {
+  if (Number.isNaN(valor)) return "Erro";
+  return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 8 }).format(valor);
+}
+
+// Avalia uma expressao em tokens respeitando precedencia (x/÷ antes de +/-) e parenteses.
+function avaliar(tokens: string[]): number {
+  let pos = 0;
+
+  function parsePrimario(): number {
+    if (tokens[pos] === "(") {
+      pos++;
+      const v = parseExpressao();
+      if (tokens[pos] === ")") pos++;
+      return v;
+    }
+    const t = tokens[pos];
+    pos++;
+    if (t === undefined || ehSimbolo(t)) return NaN;
+    return paraNumero(t);
+  }
+
+  function parseTermo(): number {
+    let v = parsePrimario();
+    while (tokens[pos] === "×" || tokens[pos] === "÷") {
+      const op = tokens[pos];
+      pos++;
+      const rhs = parsePrimario();
+      v = op === "×" ? v * rhs : rhs === 0 ? NaN : v / rhs;
+    }
+    return v;
+  }
+
+  function parseExpressao(): number {
+    let v = parseTermo();
+    while (tokens[pos] === "+" || tokens[pos] === "-") {
+      const op = tokens[pos];
+      pos++;
+      const rhs = parseTermo();
+      v = op === "+" ? v + rhs : v - rhs;
+    }
+    return v;
+  }
+
+  if (tokens.length === 0) return NaN;
+  const v = parseExpressao();
+  return pos === tokens.length ? v : NaN;
+}
+
+// Valor a mostrar no visor grande: o numero em edicao, o resultado do ultimo
+// grupo fechado "(...)" ou o numero anterior mais proximo.
+function valorAtualExibido(tokens: string[]): string {
+  if (tokens.length === 0) return "0";
+  const ultimo = tokens[tokens.length - 1];
+  if (!ehSimbolo(ultimo)) return formatarNumeroToken(ultimo);
+  if (ultimo === ")") {
+    let nivel = 0;
+    for (let i = tokens.length - 1; i >= 0; i--) {
+      if (tokens[i] === ")") nivel++;
+      else if (tokens[i] === "(") {
+        nivel--;
+        if (nivel === 0) return formatarResultado(avaliar(tokens.slice(i + 1, tokens.length - 1)));
+      }
+    }
+    return "0";
+  }
+  return valorAtualExibido(tokens.slice(0, -1));
 }
 
 export default function Calculadora() {
-  const [display, setDisplay] = useState("0");
-  const [acumulado, setAcumulado] = useState<number | null>(null);
-  const [operador, setOperador] = useState<Operador | null>(null);
-  const [aguardandoNovoValor, setAguardandoNovoValor] = useState(false);
-  const [pilha, setPilha] = useState<Array<{ acumulado: number | null; operador: Operador | null }>>([]);
+  const [tokens, setTokens] = useState<string[]>([]);
+  const [resultado, setResultado] = useState<string | null>(null);
+  const [expressaoCongelada, setExpressaoCongelada] = useState<string[]>([]);
+
+  const ultimo = tokens[tokens.length - 1];
+  const editandoNumero = tokens.length > 0 && !ehSimbolo(ultimo);
 
   function limpar() {
-    setDisplay("0");
-    setAcumulado(null);
-    setOperador(null);
-    setAguardandoNovoValor(false);
-    setPilha([]);
+    setTokens([]);
+    setResultado(null);
+    setExpressaoCongelada([]);
   }
 
-  function inputDigito(digito: string) {
-    if (display === "Erro" || aguardandoNovoValor) {
-      setDisplay(digito);
-      setAguardandoNovoValor(false);
+  function inputDigito(d: string) {
+    if (resultado !== null) {
+      setResultado(null);
+      setTokens([d]);
       return;
     }
-    setDisplay(display === "0" ? digito : display + digito);
+    if (tokens.length === 0 || ehSimbolo(ultimo)) {
+      setTokens((t) => [...t, d]);
+      return;
+    }
+    setTokens((t) => {
+      const copia = [...t];
+      const atual = copia[copia.length - 1];
+      copia[copia.length - 1] = atual === "0" ? d : atual === "-0" ? "-" + d : atual + d;
+      return copia;
+    });
   }
 
   function inputPonto() {
-    if (display === "Erro" || aguardandoNovoValor) {
-      setDisplay("0,");
-      setAguardandoNovoValor(false);
+    if (resultado !== null) {
+      setResultado(null);
+      setTokens(["0,"]);
       return;
     }
-    if (!display.includes(",")) setDisplay(display + ",");
+    if (tokens.length === 0 || ehSimbolo(ultimo)) {
+      setTokens((t) => [...t, "0,"]);
+      return;
+    }
+    setTokens((t) => {
+      const copia = [...t];
+      const atual = copia[copia.length - 1];
+      if (!atual.includes(",")) copia[copia.length - 1] = atual + ",";
+      return copia;
+    });
   }
 
   function apagar() {
-    if (display === "Erro" || aguardandoNovoValor) return;
-    setDisplay(display.length > 1 ? display.slice(0, -1) : "0");
+    if (resultado !== null) {
+      limpar();
+      return;
+    }
+    if (tokens.length === 0) return;
+    if (ehSimbolo(ultimo)) {
+      setTokens((t) => t.slice(0, -1));
+      return;
+    }
+    if (ultimo.length <= 1 || (ultimo.startsWith("-") && ultimo.length <= 2)) {
+      setTokens((t) => (t.length === 1 ? [] : [...t.slice(0, -1), "0"]));
+      return;
+    }
+    setTokens((t) => [...t.slice(0, -1), ultimo.slice(0, -1)]);
   }
 
   function alternarSinal() {
-    if (display === "Erro" || display === "0") return;
-    setDisplay(display.startsWith("-") ? display.slice(1) : "-" + display);
-  }
-
-  function valorAtual() {
-    return Number(display.replace(",", "."));
+    if (resultado !== null) {
+      setResultado((r) => (r && r !== "Erro" ? (r.startsWith("-") ? r.slice(1) : "-" + r) : r));
+      return;
+    }
+    if (!editandoNumero || ultimo === "0") return;
+    setTokens((t) => {
+      const copia = [...t];
+      const atual = copia[copia.length - 1];
+      copia[copia.length - 1] = atual.startsWith("-") ? atual.slice(1) : "-" + atual;
+      return copia;
+    });
   }
 
   function pressPercentual() {
-    if (display === "Erro") return;
-    const atual = valorAtual();
-    // Com + ou -, "%" calcula a porcentagem sobre o valor acumulado
-    // (ex: 200 + 10% = 220). Com × ou ÷, ou sem operador pendente,
-    // "%" apenas converte o valor atual em fracao (ex: 200 × 50% = 100).
-    const resultado =
-      (operador === "+" || operador === "-") && acumulado !== null
-        ? acumulado * (atual / 100)
-        : atual / 100;
-    setDisplay(String(resultado).replace(".", ","));
-    setAguardandoNovoValor(true);
+    if (resultado !== null) {
+      const v = paraNumero(resultado.replace(/\./g, "")) / 100;
+      setResultado(formatarResultado(v));
+      return;
+    }
+    if (!editandoNumero) return;
+    const valorAtual = paraNumero(ultimo);
+    const opAnterior = tokens[tokens.length - 2];
+    let novoValor: number;
+    if (opAnterior === "+" || opAnterior === "-") {
+      const base = avaliar(tokens.slice(0, -2));
+      novoValor = Number.isNaN(base) ? valorAtual / 100 : base * (valorAtual / 100);
+    } else {
+      novoValor = valorAtual / 100;
+    }
+    setTokens((t) => [...t.slice(0, -1), String(novoValor).replace(".", ",")]);
   }
 
-  function pressOperador(novoOperador: Operador) {
-    if (display === "Erro") return;
-    if (operador && acumulado !== null && !aguardandoNovoValor) {
-      const resultado = calcular(acumulado, valorAtual(), operador);
-      setDisplay(Number.isNaN(resultado) ? "Erro" : String(resultado).replace(".", ","));
-      setAcumulado(Number.isNaN(resultado) ? null : resultado);
-    } else {
-      setAcumulado(valorAtual());
+  function pressOperador(op: Exclude<Simbolo, "(" | ")">) {
+    if (resultado !== null) {
+      setTokens([resultado.replace(/\./g, ""), op]);
+      setResultado(null);
+      return;
     }
-    setOperador(novoOperador);
-    setAguardandoNovoValor(true);
+    if (tokens.length === 0) {
+      if (op === "-") setTokens(["0", "-"]);
+      return;
+    }
+    if (ultimo === "(") {
+      if (op === "-") setTokens((t) => [...t, "0", "-"]);
+      return;
+    }
+    if (ehOperadorBinario(ultimo)) {
+      setTokens((t) => [...t.slice(0, -1), op]);
+      return;
+    }
+    setTokens((t) => [...t, op]);
   }
 
   function abrirParenteses() {
-    if (display === "Erro") return;
-    setPilha((p) => [...p, { acumulado, operador }]);
-    setAcumulado(null);
-    setOperador(null);
-    setAguardandoNovoValor(true);
+    if (resultado !== null) {
+      setResultado(null);
+      setTokens(["("]);
+      return;
+    }
+    if (tokens.length === 0 || ehSimbolo(ultimo)) {
+      setTokens((t) => [...t, "("]);
+    }
   }
 
   function fecharParenteses() {
-    if (display === "Erro" || pilha.length === 0) return;
-    const subResultado = operador !== null && acumulado !== null ? calcular(acumulado, valorAtual(), operador) : valorAtual();
-    const anterior = pilha[pilha.length - 1];
-    setPilha((p) => p.slice(0, -1));
-    setAcumulado(anterior.acumulado);
-    setOperador(anterior.operador);
-    setDisplay(Number.isNaN(subResultado) ? "Erro" : String(subResultado).replace(".", ","));
-    setAguardandoNovoValor(true);
+    if (resultado !== null || !editandoNumero) return;
+    const abertos = tokens.filter((t) => t === "(").length;
+    const fechados = tokens.filter((t) => t === ")").length;
+    if (abertos <= fechados) return;
+    setTokens((t) => [...t, ")"]);
   }
 
   function pressIgual() {
-    if (display === "Erro" || operador === null || acumulado === null) return;
-    const resultado = calcular(acumulado, valorAtual(), operador);
-    setDisplay(Number.isNaN(resultado) ? "Erro" : String(resultado).replace(".", ","));
-    setAcumulado(null);
-    setOperador(null);
-    setAguardandoNovoValor(true);
-    setPilha([]);
+    if (tokens.length === 0 || precisaDeMais(ultimo)) return;
+    const abertos = tokens.filter((t) => t === "(").length;
+    const fechados = tokens.filter((t) => t === ")").length;
+    const balanceados = [...tokens, ...Array(Math.max(0, abertos - fechados)).fill(")")];
+    const valor = avaliar(balanceados);
+    setExpressaoCongelada(balanceados);
+    setResultado(formatarResultado(valor));
   }
+
+  const tokensExibidos = resultado !== null ? expressaoCongelada : tokens;
+  const linhaPequena = editandoNumero && resultado === null ? tokensExibidos.slice(0, -1) : tokensExibidos;
+  const numeroGrande = resultado !== null ? resultado : valorAtualExibido(tokens);
 
   const botaoBase = "rounded-xl py-4 text-lg font-semibold transition-colors";
   const botaoNumero = `${botaoBase} bg-[#f0f2f8] text-[#1B2A6B] hover:bg-[#e4e7f2]`;
@@ -135,7 +261,10 @@ export default function Calculadora() {
   return (
     <div>
       <div className="mb-4 rounded-xl bg-[#f7f8fc] px-4 py-5 text-right">
-        <div className="truncate text-3xl font-bold text-[#1B2A6B]">{formatarDisplay(display)}</div>
+        <div className="h-5 truncate text-sm text-gray-400">
+          {linhaPequena.map((t) => (ehSimbolo(t) ? t : formatarNumeroToken(t))).join(" ")}
+        </div>
+        <div className="truncate text-3xl font-bold text-[#1B2A6B]">{numeroGrande}</div>
       </div>
 
       <div className="grid grid-cols-4 gap-2">
