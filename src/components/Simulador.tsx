@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
+import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 
 const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -23,6 +24,30 @@ export default function Simulador() {
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
     setEntradaInput(String(getBounds(novoPlano).min));
+  }
+
+  const [pix, setPix] = useState<{ entrada: number; cobranca: PixCobranca } | null>(null);
+  const [pixCopiado, setPixCopiado] = useState(false);
+
+  useEffect(() => {
+    if (step !== "pagamento") return;
+    let cancelado = false;
+    gerarPixCobranca(resultado.entrada).then((cobranca) => {
+      if (!cancelado) setPix({ entrada: resultado.entrada, cobranca });
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, [step, resultado.entrada]);
+
+  const pixAtual = pix?.entrada === resultado.entrada ? pix.cobranca : null;
+  const pixCarregando = step === "pagamento" && !pixAtual;
+
+  async function copiarCodigoPix() {
+    if (!pixAtual) return;
+    await navigator.clipboard.writeText(pixAtual.brCode);
+    setPixCopiado(true);
+    setTimeout(() => setPixCopiado(false), 2000);
   }
 
   return (
@@ -108,21 +133,42 @@ export default function Simulador() {
           </>
         ) : (
           <>
-            <div className="flex justify-center mb-5">
-              <Image
-                src="/images/qrcode.jpg"
-                alt="QR code PIX"
-                width={220}
-                height={220}
-                className="rounded-lg"
-              />
+            <div className="flex justify-center mb-5 h-[220px] w-[220px] mx-auto items-center">
+              {pixAtual ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={pixAtual.qrCodeImage}
+                  alt="QR code PIX"
+                  width={220}
+                  height={220}
+                  className="rounded-lg"
+                />
+              ) : (
+                <Image
+                  src="/images/qrcode.jpg"
+                  alt="QR code PIX"
+                  width={220}
+                  height={220}
+                  className={`rounded-lg ${pixCarregando ? "opacity-40" : ""}`}
+                />
+              )}
             </div>
 
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200 mb-5">
-              <InfoRow label="Entrada escolhida" value={formatBRL(resultado.entrada)} />
+              <InfoRow label="Valor a pagar" value={formatBRL(resultado.entrada)} destaque />
               <InfoRow label="Chave PIX - CNPJ" value="34.295.555/0001-20" />
               <InfoRow label="Beneficiário" value="Insider Mentoring" />
             </div>
+
+            {pixAtual && (
+              <button
+                type="button"
+                onClick={copiarCodigoPix}
+                className="w-full rounded-full bg-[#1B2A6B] py-3 text-sm font-bold text-white mb-3"
+              >
+                {pixCopiado ? "Código copiado!" : "Copiar código PIX (copia e cola)"}
+              </button>
+            )}
 
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="h-2 w-2 rounded-full bg-[#E8522A]" />
