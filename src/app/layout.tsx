@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -11,6 +11,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Insider Mentoring - Simulador",
   description: "Simulador de entrada e pagamento do programa Insider Mentoring",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Insider Mentoring",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1B2A6B",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
