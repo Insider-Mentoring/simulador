@@ -69,6 +69,20 @@ export default function Calculadora() {
     return Number(display.replace(",", "."));
   }
 
+  function pressPercentual() {
+    if (display === "Erro") return;
+    const atual = valorAtual();
+    // Com + ou -, "%" calcula a porcentagem sobre o valor acumulado
+    // (ex: 200 + 10% = 220). Com × ou ÷, ou sem operador pendente,
+    // "%" apenas converte o valor atual em fracao (ex: 200 × 50% = 100).
+    const resultado =
+      (operador === "+" || operador === "-") && acumulado !== null
+        ? acumulado * (atual / 100)
+        : atual / 100;
+    setDisplay(String(resultado).replace(".", ","));
+    setAguardandoNovoValor(true);
+  }
+
   function pressOperador(novoOperador: Operador) {
     if (display === "Erro") return;
     if (operador && acumulado !== null && !aguardandoNovoValor) {
@@ -112,8 +126,8 @@ export default function Calculadora() {
         <button type="button" onClick={alternarSinal} className={botaoAcao}>
           ±
         </button>
-        <button type="button" onClick={() => pressOperador("÷")} className={botaoOperador}>
-          ÷
+        <button type="button" onClick={pressPercentual} className={botaoAcao}>
+          %
         </button>
 
         <button type="button" onClick={() => inputDigito("7")} className={botaoNumero}>
@@ -125,8 +139,8 @@ export default function Calculadora() {
         <button type="button" onClick={() => inputDigito("9")} className={botaoNumero}>
           9
         </button>
-        <button type="button" onClick={() => pressOperador("×")} className={botaoOperador}>
-          ×
+        <button type="button" onClick={() => pressOperador("÷")} className={botaoOperador}>
+          ÷
         </button>
 
         <button type="button" onClick={() => inputDigito("4")} className={botaoNumero}>
@@ -138,8 +152,8 @@ export default function Calculadora() {
         <button type="button" onClick={() => inputDigito("6")} className={botaoNumero}>
           6
         </button>
-        <button type="button" onClick={() => pressOperador("-")} className={botaoOperador}>
-          -
+        <button type="button" onClick={() => pressOperador("×")} className={botaoOperador}>
+          ×
         </button>
 
         <button type="button" onClick={() => inputDigito("1")} className={botaoNumero}>
@@ -151,8 +165,8 @@ export default function Calculadora() {
         <button type="button" onClick={() => inputDigito("3")} className={botaoNumero}>
           3
         </button>
-        <button type="button" onClick={() => pressOperador("+")} className={botaoOperador}>
-          +
+        <button type="button" onClick={() => pressOperador("-")} className={botaoOperador}>
+          -
         </button>
 
         <button type="button" onClick={() => inputDigito("0")} className={`${botaoNumero} col-span-2`}>
@@ -161,10 +175,14 @@ export default function Calculadora() {
         <button type="button" onClick={inputPonto} className={botaoNumero}>
           ,
         </button>
+        <button type="button" onClick={() => pressOperador("+")} className={botaoOperador}>
+          +
+        </button>
+
         <button
           type="button"
           onClick={pressIgual}
-          className={`${botaoBase} bg-[#E8522A] text-white hover:bg-[#d1461f]`}
+          className={`${botaoBase} col-span-4 bg-[#E8522A] text-white hover:bg-[#d1461f]`}
         >
           =
         </button>
