@@ -4,20 +4,24 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
+import Calculadora from "@/components/Calculadora";
 
 const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
+const parseValor = (texto: string) => Number(texto.replace(/\./g, "").replace(",", "."));
+
 const PLANO_OPTIONS: Plano[] = ["individual", "dupla", "trio"];
 
 export default function Simulador() {
-  const [plano, setPlano] = useState<Plano>("trio");
+  const [view, setView] = useState<"simulador" | "calculadora">("simulador");
+  const [plano, setPlano] = useState<Plano>("individual");
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
   const bounds = getBounds(plano);
   const [entradaInput, setEntradaInput] = useState(String(bounds.min));
 
   const resultado = useMemo(() => {
-    const valor = Number(entradaInput.replace(/\./g, "").replace(",", ".")) || bounds.min;
+    const valor = parseValor(entradaInput) || bounds.min;
     return simular(plano, valor);
   }, [plano, entradaInput, bounds.min]);
 
@@ -26,21 +30,30 @@ export default function Simulador() {
     setEntradaInput(String(getBounds(novoPlano).min));
   }
 
-  const [pix, setPix] = useState<{ entrada: number; cobranca: PixCobranca } | null>(null);
+  const [pixValorOverride, setPixValorOverride] = useState<string | null>(null);
+  const pixValorInput = pixValorOverride ?? String(resultado.entrada);
+  const pixValorParsed = parseValor(pixValorInput) || resultado.entrada;
+
+  function irParaPagamento() {
+    setPixValorOverride(null);
+    setStep("pagamento");
+  }
+
+  const [pix, setPix] = useState<{ valor: number; cobranca: PixCobranca } | null>(null);
   const [pixCopiado, setPixCopiado] = useState(false);
 
   useEffect(() => {
-    if (step !== "pagamento") return;
+    if (step !== "pagamento" || pixValorParsed <= 0) return;
     let cancelado = false;
-    gerarPixCobranca(resultado.entrada).then((cobranca) => {
-      if (!cancelado) setPix({ entrada: resultado.entrada, cobranca });
+    gerarPixCobranca(pixValorParsed).then((cobranca) => {
+      if (!cancelado) setPix({ valor: pixValorParsed, cobranca });
     });
     return () => {
       cancelado = true;
     };
-  }, [step, resultado.entrada]);
+  }, [step, pixValorParsed]);
 
-  const pixAtual = pix?.entrada === resultado.entrada ? pix.cobranca : null;
+  const pixAtual = pix?.valor === pixValorParsed ? pix.cobranca : null;
   const pixCarregando = step === "pagamento" && !pixAtual;
 
   async function copiarCodigoPix() {
@@ -69,11 +82,34 @@ export default function Simulador() {
             Insider <span className="text-[#E8522A]">Mentoring</span>
           </div>
           <div className="text-sm text-gray-500 mt-1">
-            {step === "calc" ? "Simulador de investimento" : "Pagamento"}
+            {view === "calculadora" ? "Calculadora" : step === "calc" ? "Simulador de investimento" : "Pagamento"}
           </div>
         </div>
 
-        {step === "calc" ? (
+        <div className="flex gap-2 mb-5">
+          <button
+            type="button"
+            onClick={() => setView("simulador")}
+            className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+              view === "simulador" ? "bg-[#1B2A6B] text-white" : "bg-[#f0f2f8] text-[#1B2A6B]"
+            }`}
+          >
+            Simulador
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("calculadora")}
+            className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+              view === "calculadora" ? "bg-[#1B2A6B] text-white" : "bg-[#f0f2f8] text-[#1B2A6B]"
+            }`}
+          >
+            Calculadora
+          </button>
+        </div>
+
+        {view === "calculadora" ? (
+          <Calculadora />
+        ) : step === "calc" ? (
           <>
             <div className="flex gap-2 mb-5">
               {PLANO_OPTIONS.map((opcao) => (
@@ -130,7 +166,7 @@ export default function Simulador() {
 
             <button
               type="button"
-              onClick={() => setStep("pagamento")}
+              onClick={irParaPagamento}
               className="mt-5 w-full rounded-full bg-[#E8522A] py-3 text-sm font-bold text-white"
             >
               Ir para pagamento
@@ -159,8 +195,23 @@ export default function Simulador() {
               )}
             </div>
 
+            <label className="block mb-4">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Valor a cobrar no PIX
+              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={pixValorInput}
+                onChange={(e) => setPixValorOverride(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+              />
+              <span className="text-xs text-gray-400">
+                Pode ajustar livremente — não precisa ser igual à entrada simulada
+              </span>
+            </label>
+
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200 mb-5">
-              <InfoRow label="Valor a pagar" value={formatBRL(resultado.entrada)} destaque />
               <InfoRow label="Chave PIX - CNPJ" value="34.295.555/0001-20" />
               <InfoRow label="Beneficiário" value="Insider Mentoring" />
             </div>
