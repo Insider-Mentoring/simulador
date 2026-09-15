@@ -19,7 +19,7 @@ function calcular(a: number, b: number, operador: Operador): number {
 
 function formatarDisplay(valor: string): string {
   if (valor === "Erro") return valor;
-  const numero = Number(valor);
+  const numero = Number(valor.replace(",", "."));
   if (Number.isNaN(numero)) return "Erro";
   return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 8 }).format(numero);
 }
