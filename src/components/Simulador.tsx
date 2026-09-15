@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
+import { PLANOS, getBounds, simular, type Plano, type ConfigPrecos } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
+import { carregarConfig } from "@/lib/config";
 import Calculadora from "@/components/Calculadora";
+import Configuracoes from "@/components/Configuracoes";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
 
 const formatBRL = (value: number) =>
@@ -15,16 +17,17 @@ const parseValor = (texto: string) => Number(texto.replace(/\./g, "").replace(",
 const PLANO_OPTIONS: Plano[] = ["individual", "dupla", "trio"];
 
 export default function Simulador() {
-  const [view, setView] = useState<"simulador" | "calculadora">("simulador");
+  const [view, setView] = useState<"simulador" | "calculadora" | "config">("simulador");
   const [plano, setPlano] = useState<Plano>("individual");
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
+  const [config, setConfig] = useState<ConfigPrecos>(() => carregarConfig());
   const bounds = getBounds(plano);
   const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(bounds.min));
 
   const resultado = useMemo(() => {
     const valor = parseValor(entradaInput) || bounds.min;
-    return simular(plano, valor);
-  }, [plano, entradaInput, bounds.min]);
+    return simular(plano, valor, config);
+  }, [plano, entradaInput, bounds.min, config]);
 
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
@@ -83,7 +86,13 @@ export default function Simulador() {
             Insider <span className="text-[#E8522A]">Mentoring</span>
           </div>
           <div className="text-sm text-gray-500 mt-1">
-            {view === "calculadora" ? "Calculadora" : step === "calc" ? "Simulador de investimento" : "Pagamento"}
+            {view === "calculadora"
+              ? "Calculadora"
+              : view === "config"
+                ? "Configurações"
+                : step === "calc"
+                  ? "Simulador de investimento"
+                  : "Pagamento"}
           </div>
         </div>
 
@@ -106,9 +115,21 @@ export default function Simulador() {
           >
             Calculadora
           </button>
+          <button
+            type="button"
+            onClick={() => setView("config")}
+            className={`rounded-full px-3 py-2 text-sm font-semibold transition-colors ${
+              view === "config" ? "bg-[#1B2A6B] text-white" : "bg-[#f0f2f8] text-[#1B2A6B]"
+            }`}
+            aria-label="Configurações"
+          >
+            ⚙
+          </button>
         </div>
 
-        {view === "calculadora" ? (
+        {view === "config" ? (
+          <Configuracoes config={config} onConfigChange={setConfig} />
+        ) : view === "calculadora" ? (
           <Calculadora />
         ) : step === "calc" ? (
           <>
@@ -160,7 +181,9 @@ export default function Simulador() {
             <p className="mt-2 text-[11px] text-gray-400">
               {resultado.exato
                 ? "Valores exatos da tabela oficial."
-                : "Valor fora da tabela oficial — calculado com o percentual de desconto padrão (17,441%)."}
+                : `Valor fora da tabela oficial — calculado com ${(config.taxaDesconto * 100)
+                    .toFixed(3)
+                    .replace(".", ",")}% de desconto.`}
             </p>
 
             <button
