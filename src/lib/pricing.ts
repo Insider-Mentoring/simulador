@@ -150,6 +150,7 @@ const DUPLA: Row[] = [
 ];
 
 const INDIVIDUAL: Row[] = [
+  { entrada: 2000, desconto: 348.83, remanescente: 44973 },
   { entrada: 3000, desconto: 523.24, remanescente: 43449.76 },
   { entrada: 4000, desconto: 697.65, remanescente: 42275.35 },
   { entrada: 5000, desconto: 872.07, remanescente: 41100.93 },
