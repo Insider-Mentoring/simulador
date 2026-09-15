@@ -9,6 +9,7 @@ type Row = {
 export type ResultadoSimulacao = Row & {
   parcelaRestante: number;
   investimentoTotal: number;
+  exato: boolean;
 };
 
 const round2 = (value: number) => Math.round(value * 100) / 100;
@@ -202,22 +203,45 @@ export function getBounds(plano: Plano) {
   return { min: rows[0].entrada, max: rows[rows.length - 1].entrada };
 }
 
+// Percentual de desconto aplicado sobre a entrada, confirmado nas 3 tabelas
+// (desconto/entrada = ~17,441% em praticamente todas as linhas).
+const TAXA_DESCONTO = 0.17441;
+
+// "Valor cheio" de cada plano (entrada + remanescente + desconto), obtido por
+// regressao linear sobre as linhas oficiais da tabela. Usado só para calcular
+// valores de entrada que nao existem exatamente na tabela.
+const VALOR_CHEIO: Record<Plano, number> = {
+  individual: 46972.97,
+  dupla: 70459.5,
+  trio: 82202.75,
+};
+
+const EPSILON = 0.01;
+
 export function simular(plano: Plano, valorDesejado: number): ResultadoSimulacao {
   const rows = PLANOS[plano].rows;
   const clamped = Math.min(Math.max(valorDesejado, rows[0].entrada), rows[rows.length - 1].entrada);
 
-  let closest = rows[0];
-  let closestDiff = Math.abs(rows[0].entrada - clamped);
-  for (const row of rows) {
-    const diff = Math.abs(row.entrada - clamped);
-    if (diff < closestDiff) {
-      closest = row;
-      closestDiff = diff;
-    }
+  const rowExata = rows.find((row) => Math.abs(row.entrada - clamped) < EPSILON);
+  if (rowExata) {
+    return {
+      ...rowExata,
+      parcelaRestante: round2(rowExata.remanescente / 9),
+      investimentoTotal: round2(rowExata.entrada + rowExata.remanescente),
+      exato: true,
+    };
   }
 
-  const investimentoTotal = round2(closest.entrada + closest.remanescente);
-  const parcelaRestante = round2(closest.remanescente / 9);
+  const entrada = round2(clamped);
+  const desconto = round2(entrada * TAXA_DESCONTO);
+  const remanescente = round2(VALOR_CHEIO[plano] - entrada - desconto);
 
-  return { ...closest, parcelaRestante, investimentoTotal };
+  return {
+    entrada,
+    desconto,
+    remanescente,
+    parcelaRestante: round2(remanescente / 9),
+    investimentoTotal: round2(entrada + remanescente),
+    exato: false,
+  };
 }
