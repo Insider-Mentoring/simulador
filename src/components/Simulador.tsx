@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
-import CurrencyInput from "@/components/CurrencyInput";
+import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
 
 const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -19,7 +19,7 @@ export default function Simulador() {
   const [plano, setPlano] = useState<Plano>("individual");
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
   const bounds = getBounds(plano);
-  const [entradaInput, setEntradaInput] = useState(String(bounds.min));
+  const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(bounds.min));
 
   const resultado = useMemo(() => {
     const valor = parseValor(entradaInput) || bounds.min;
@@ -28,11 +28,11 @@ export default function Simulador() {
 
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
-    setEntradaInput(String(getBounds(novoPlano).min));
+    setEntradaInput(numeroParaTextoBR(getBounds(novoPlano).min));
   }
 
   const [pixValorOverride, setPixValorOverride] = useState<string | null>(null);
-  const pixValorInput = pixValorOverride ?? String(resultado.entrada);
+  const pixValorInput = pixValorOverride ?? numeroParaTextoBR(resultado.entrada);
   const pixValorParsed = parseValor(pixValorInput) || resultado.entrada;
 
   function irParaPagamento() {
