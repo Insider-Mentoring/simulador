@@ -29,12 +29,14 @@ export default function Calculadora() {
   const [acumulado, setAcumulado] = useState<number | null>(null);
   const [operador, setOperador] = useState<Operador | null>(null);
   const [aguardandoNovoValor, setAguardandoNovoValor] = useState(false);
+  const [pilha, setPilha] = useState<Array<{ acumulado: number | null; operador: Operador | null }>>([]);
 
   function limpar() {
     setDisplay("0");
     setAcumulado(null);
     setOperador(null);
     setAguardandoNovoValor(false);
+    setPilha([]);
   }
 
   function inputDigito(digito: string) {
@@ -96,6 +98,25 @@ export default function Calculadora() {
     setAguardandoNovoValor(true);
   }
 
+  function abrirParenteses() {
+    if (display === "Erro") return;
+    setPilha((p) => [...p, { acumulado, operador }]);
+    setAcumulado(null);
+    setOperador(null);
+    setAguardandoNovoValor(true);
+  }
+
+  function fecharParenteses() {
+    if (display === "Erro" || pilha.length === 0) return;
+    const subResultado = operador !== null && acumulado !== null ? calcular(acumulado, valorAtual(), operador) : valorAtual();
+    const anterior = pilha[pilha.length - 1];
+    setPilha((p) => p.slice(0, -1));
+    setAcumulado(anterior.acumulado);
+    setOperador(anterior.operador);
+    setDisplay(Number.isNaN(subResultado) ? "Erro" : String(subResultado).replace(".", ","));
+    setAguardandoNovoValor(true);
+  }
+
   function pressIgual() {
     if (display === "Erro" || operador === null || acumulado === null) return;
     const resultado = calcular(acumulado, valorAtual(), operador);
@@ -103,6 +124,7 @@ export default function Calculadora() {
     setAcumulado(null);
     setOperador(null);
     setAguardandoNovoValor(true);
+    setPilha([]);
   }
 
   const botaoBase = "rounded-xl py-4 text-lg font-semibold transition-colors";
@@ -117,6 +139,13 @@ export default function Calculadora() {
       </div>
 
       <div className="grid grid-cols-4 gap-2">
+        <button type="button" onClick={abrirParenteses} className={`${botaoAcao} col-span-2`}>
+          (
+        </button>
+        <button type="button" onClick={fecharParenteses} className={`${botaoAcao} col-span-2`}>
+          )
+        </button>
+
         <button type="button" onClick={limpar} className={botaoAcao}>
           C
         </button>
