@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
+import CurrencyInput from "@/components/CurrencyInput";
 
 const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -132,11 +133,9 @@ export default function Simulador() {
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Valor de entrada
               </span>
-              <input
-                type="text"
-                inputMode="numeric"
+              <CurrencyInput
                 value={entradaInput}
-                onChange={(e) => setEntradaInput(e.target.value)}
+                onChange={setEntradaInput}
                 className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
               />
               <span className="text-xs text-gray-400">
@@ -199,11 +198,9 @@ export default function Simulador() {
               <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                 Valor a cobrar no PIX
               </span>
-              <input
-                type="text"
-                inputMode="numeric"
+              <CurrencyInput
                 value={pixValorInput}
-                onChange={(e) => setPixValorOverride(e.target.value)}
+                onChange={setPixValorOverride}
                 className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
               />
               <span className="text-xs text-gray-400">
