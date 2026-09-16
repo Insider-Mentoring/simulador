@@ -169,11 +169,6 @@ export default function Simulador() {
                 destaque
               />
             </div>
-            <p className="mt-2 text-[11px] text-gray-400">
-              {resultado.exato
-                ? "Valores exatos da tabela oficial."
-                : "Valor fora da tabela oficial — calculado com 17,441% de desconto."}
-            </p>
 
             <button
               type="button"
