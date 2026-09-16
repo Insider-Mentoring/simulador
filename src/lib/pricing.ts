@@ -17,8 +17,9 @@ const round2 = (value: number) => Math.round(value * 100) / 100;
 // Valores transcritos da tabela impressa (fotos). O plano Individual veio de
 // uma foto rotacionada/mais dificil de ler - vale conferir com a fonte original.
 const TRIO: Row[] = [
-  { entrada: 2000, desconto: 348.83, remanescente: 79853.92 },
-  { entrada: 3000, desconto: 523.24, remanescente: 78679.51 },
+  // R$3.000 e a "Oferta Padrao" (sem desconto de entrada, so valor cheio -
+  // entrada). Nao existe oferta real de R$2.000 para o Trio.
+  { entrada: 3000, desconto: 0, remanescente: 79202.75 },
   { entrada: 4000, desconto: 697.65, remanescente: 77505.1 },
   { entrada: 5000, desconto: 872.06, remanescente: 76330.69 },
   { entrada: 6000, desconto: 1046.47, remanescente: 75156.28 },
@@ -89,8 +90,9 @@ const TRIO: Row[] = [
 ];
 
 const DUPLA: Row[] = [
-  { entrada: 2000, desconto: 348.83, remanescente: 68110.67 },
-  { entrada: 3000, desconto: 523.24, remanescente: 66936.26 },
+  // R$3.000 e a "Oferta Padrao" (sem desconto de entrada, so valor cheio -
+  // entrada). Nao existe oferta real de R$2.000 para a Dupla.
+  { entrada: 3000, desconto: 0, remanescente: 67459.5 },
   { entrada: 4000, desconto: 697.65, remanescente: 65761.85 },
   { entrada: 5000, desconto: 872.06, remanescente: 64587.44 },
   { entrada: 6000, desconto: 1046.47, remanescente: 63413.03 },
