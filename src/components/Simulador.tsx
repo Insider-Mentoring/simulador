@@ -75,8 +75,19 @@ export default function Simulador() {
 
       <div className="bg-white px-6 pb-6 pt-7">
         <div className="mb-5">
-          <div className="text-2xl font-extrabold leading-tight tracking-tight text-[#1B2A6B]">
-            Insider <span className="text-[#E8522A]">Mentoring</span>
+          <div className="flex items-center justify-between">
+            <div className="text-2xl font-extrabold leading-tight tracking-tight text-[#1B2A6B]">
+              Insider <span className="text-[#E8522A]">Mentoring</span>
+            </div>
+            {naPagina && (
+              <button
+                type="button"
+                onClick={() => setStep("calc")}
+                className="shrink-0 rounded-full bg-[#f0f2f8] px-3 py-1.5 text-xs font-semibold text-[#1B2A6B]"
+              >
+                ← Voltar
+              </button>
+            )}
           </div>
           <div className="text-sm text-gray-500 mt-1">
             {view === "calculadora" ? "Calculadora" : step === "calc" ? "Simulador de investimento" : "Pagamento"}
