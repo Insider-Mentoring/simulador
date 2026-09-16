@@ -127,7 +127,7 @@ export default function Simulador() {
 
             <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
-                Oferta padrão — {PLANOS[plano].label}
+                Oferta na imersão — {PLANOS[plano].label}
               </div>
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-sm text-gray-500">À vista</span>
