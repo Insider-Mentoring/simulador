@@ -133,13 +133,16 @@ export default function Simulador() {
                 <span className="text-sm text-gray-500">À vista</span>
                 <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
               </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-gray-500">Entrada</span>
-                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.entradaMinima)}</span>
-              </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-gray-500">9x de</span>
-                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.parcelaMinima)}</span>
+              <div className="mt-2 border-t border-[#E8F0FE] pt-2">
+                <div className="mb-1 text-xs font-semibold text-gray-500">A Prazo</div>
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-sm text-gray-500">Entrada mínima</span>
+                  <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.entradaMinima)}</span>
+                </div>
+                <div className="flex items-center justify-between py-0.5">
+                  <span className="text-sm text-gray-500">9x de</span>
+                  <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.parcelaMinima)}</span>
+                </div>
               </div>
             </div>
 
