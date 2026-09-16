@@ -216,6 +216,7 @@ export type OfertaPadrao = {
 // muda a tabela por tras - quem simular a entrada maxima ve o valor exato.
 const A_VISTA_VITRINE: Partial<Record<Plano, number>> = {
   dupla: 59997.0,
+  trio: 69997.0,
 };
 
 // Valor a vista de cada plano: a ultima linha da tabela, com o desconto
