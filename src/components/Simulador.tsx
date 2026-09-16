@@ -173,9 +173,9 @@ export default function Simulador() {
             <button
               type="button"
               onClick={irParaPagamento}
-              className="mt-5 w-full rounded-full bg-[#E8522A] py-3 text-sm font-bold text-white"
+              className="mt-5 w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
             >
-              Ir para pagamento
+              Gerar QR code PIX
             </button>
           </>
         ) : (
