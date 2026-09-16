@@ -158,7 +158,6 @@ export default function Simulador() {
               {!ehEntradaMinima && (
                 <InfoRow label="Desconto aplicado" value={formatBRL(resultado.desconto)} />
               )}
-              <InfoRow label="Valor remanescente" value={formatBRL(resultado.remanescente)} />
               <InfoRow
                 label="Parcela do restante (9x)"
                 value={formatBRL(resultado.parcelaRestante)}
