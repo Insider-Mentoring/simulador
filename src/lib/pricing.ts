@@ -203,36 +203,22 @@ export function getBounds(plano: Plano) {
   return { min: rows[0].entrada, max: rows[rows.length - 1].entrada };
 }
 
-export type ConfigPrecos = {
-  taxaDesconto: number;
-  valorCheio: Record<Plano, number>;
-};
-
 // Percentual de desconto aplicado sobre a entrada, confirmado nas 3 tabelas
 // (desconto/entrada = ~17,441% em praticamente todas as linhas).
-export const DEFAULT_TAXA_DESCONTO = 0.17441;
+const TAXA_DESCONTO = 0.17441;
 
 // "Valor cheio" de cada plano (entrada + remanescente + desconto), obtido por
 // regressao linear sobre as linhas oficiais da tabela. Usado só para calcular
 // valores de entrada que nao existem exatamente na tabela.
-export const DEFAULT_VALOR_CHEIO: Record<Plano, number> = {
+const VALOR_CHEIO: Record<Plano, number> = {
   individual: 46972.97,
   dupla: 70459.5,
   trio: 82202.75,
 };
 
-export const CONFIG_PADRAO: ConfigPrecos = {
-  taxaDesconto: DEFAULT_TAXA_DESCONTO,
-  valorCheio: DEFAULT_VALOR_CHEIO,
-};
-
 const EPSILON = 0.01;
 
-export function simular(
-  plano: Plano,
-  valorDesejado: number,
-  config: ConfigPrecos = CONFIG_PADRAO,
-): ResultadoSimulacao {
+export function simular(plano: Plano, valorDesejado: number): ResultadoSimulacao {
   const rows = PLANOS[plano].rows;
   const clamped = Math.min(Math.max(valorDesejado, rows[0].entrada), rows[rows.length - 1].entrada);
 
@@ -247,8 +233,8 @@ export function simular(
   }
 
   const entrada = round2(clamped);
-  const desconto = round2(entrada * config.taxaDesconto);
-  const remanescente = round2(config.valorCheio[plano] - entrada - desconto);
+  const desconto = round2(entrada * TAXA_DESCONTO);
+  const remanescente = round2(VALOR_CHEIO[plano] - entrada - desconto);
 
   return {
     entrada,
