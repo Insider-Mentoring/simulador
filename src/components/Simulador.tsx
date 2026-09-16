@@ -81,7 +81,7 @@ export default function Simulador() {
             <div className="text-2xl font-extrabold leading-tight tracking-tight text-[#1B2A6B]">
               Insider <span className="text-[#E8522A]">Mentoring</span>
             </div>
-            {naPagina && (
+            {naPagina ? (
               <button
                 type="button"
                 onClick={() => setStep("calc")}
@@ -89,32 +89,19 @@ export default function Simulador() {
               >
                 ← Voltar
               </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setView(view === "calculadora" ? "simulador" : "calculadora")}
+                className="shrink-0 rounded-full bg-[#f0f2f8] px-3 py-1.5 text-xs font-semibold text-[#1B2A6B]"
+              >
+                {view === "calculadora" ? "← Voltar" : "Calculadora"}
+              </button>
             )}
           </div>
           <div className="text-sm text-gray-500 mt-1">
             {view === "calculadora" ? "Calculadora" : step === "calc" ? "Desconto progressivo" : "Pagamento"}
           </div>
-        </div>
-
-        <div className="flex gap-2 mb-5">
-          <button
-            type="button"
-            onClick={() => setView("simulador")}
-            className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
-              view === "simulador" ? "bg-[#1B2A6B] text-white" : "bg-[#f0f2f8] text-[#1B2A6B]"
-            }`}
-          >
-            Simulador
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("calculadora")}
-            className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
-              view === "calculadora" ? "bg-[#1B2A6B] text-white" : "bg-[#f0f2f8] text-[#1B2A6B]"
-            }`}
-          >
-            Calculadora
-          </button>
         </div>
 
         {view === "calculadora" ? (
