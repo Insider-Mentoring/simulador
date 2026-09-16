@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SIMBOLOS = ["+", "-", "×", "÷", "(", ")"] as const;
 type Simbolo = (typeof SIMBOLOS)[number];
@@ -248,6 +248,87 @@ export default function Calculadora() {
     setExpressaoCongelada(balanceados);
     setResultado(formatarResultado(valor));
   }
+
+  const handlersRef = useRef({
+    inputDigito,
+    inputPonto,
+    pressOperador,
+    pressPercentual,
+    abrirParenteses,
+    fecharParenteses,
+    pressIgual,
+    apagar,
+    limpar,
+  });
+  useEffect(() => {
+    handlersRef.current = {
+      inputDigito,
+      inputPonto,
+      pressOperador,
+      pressPercentual,
+      abrirParenteses,
+      fecharParenteses,
+      pressIgual,
+      apagar,
+      limpar,
+    };
+  });
+
+  useEffect(() => {
+    function aoTeclar(e: KeyboardEvent) {
+      const h = handlersRef.current;
+      if (e.key >= "0" && e.key <= "9") {
+        h.inputDigito(e.key);
+        return;
+      }
+      switch (e.key) {
+        case ".":
+        case ",":
+          h.inputPonto();
+          break;
+        case "+":
+          h.pressOperador("+");
+          break;
+        case "-":
+          h.pressOperador("-");
+          break;
+        case "*":
+        case "x":
+        case "X":
+          h.pressOperador("×");
+          break;
+        case "/":
+          e.preventDefault();
+          h.pressOperador("÷");
+          break;
+        case "%":
+          h.pressPercentual();
+          break;
+        case "(":
+          h.abrirParenteses();
+          break;
+        case ")":
+          h.fecharParenteses();
+          break;
+        case "Enter":
+        case "=":
+          e.preventDefault();
+          h.pressIgual();
+          break;
+        case "Backspace":
+          h.apagar();
+          break;
+        case "Escape":
+        case "Delete":
+          h.limpar();
+          break;
+        default:
+          break;
+      }
+    }
+    window.addEventListener("keydown", aoTeclar);
+    return () => window.removeEventListener("keydown", aoTeclar);
+  }, []);
 
   const tokensExibidos = resultado !== null ? expressaoCongelada : tokens;
   const linhaPequena = editandoNumero && resultado === null ? tokensExibidos.slice(0, -1) : tokensExibidos;
