@@ -244,7 +244,14 @@ const VALOR_CHEIO: Record<Plano, number> = {
 
 const EPSILON = 0.01;
 
-export function simular(plano: Plano, valorDesejado: number): ResultadoSimulacao {
+export const MAX_PARCELAS = 9;
+
+export function simular(
+  plano: Plano,
+  valorDesejado: number,
+  numParcelas: number = MAX_PARCELAS,
+): ResultadoSimulacao {
+  const parcelas = Math.min(Math.max(Math.round(numParcelas) || MAX_PARCELAS, 1), MAX_PARCELAS);
   const rows = PLANOS[plano].rows;
   const clamped = Math.min(Math.max(valorDesejado, rows[0].entrada), rows[rows.length - 1].entrada);
 
@@ -252,7 +259,7 @@ export function simular(plano: Plano, valorDesejado: number): ResultadoSimulacao
   if (rowExata) {
     return {
       ...rowExata,
-      parcelaRestante: round2(rowExata.remanescente / 9),
+      parcelaRestante: round2(rowExata.remanescente / parcelas),
       investimentoTotal: round2(rowExata.entrada + rowExata.remanescente),
       exato: true,
     };
@@ -266,7 +273,7 @@ export function simular(plano: Plano, valorDesejado: number): ResultadoSimulacao
     entrada,
     desconto,
     remanescente,
-    parcelaRestante: round2(remanescente / 9),
+    parcelaRestante: round2(remanescente / parcelas),
     investimentoTotal: round2(entrada + remanescente),
     exato: false,
   };

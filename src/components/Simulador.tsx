@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { PLANOS, getBounds, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
+import { MAX_PARCELAS, PLANOS, getBounds, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
@@ -21,11 +21,19 @@ export default function Simulador() {
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
   const bounds = getBounds(plano);
   const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(bounds.min));
+  const [parcelasInput, setParcelasInput] = useState(String(MAX_PARCELAS));
+
+  const entradaDigitada = parseValor(entradaInput);
+  const entradaAbaixoDoMinimo = entradaDigitada > 0 && entradaDigitada < bounds.min;
+
+  const parcelasDigitadas = parseInt(parcelasInput, 10);
+  const parcelasAcimaDoMaximo = parcelasDigitadas > MAX_PARCELAS;
+  const numParcelas = Math.min(Math.max(parcelasDigitadas || MAX_PARCELAS, 1), MAX_PARCELAS);
 
   const resultado = useMemo(() => {
-    const valor = parseValor(entradaInput) || bounds.min;
-    return simular(plano, valor);
-  }, [plano, entradaInput, bounds.min]);
+    const valor = entradaDigitada || bounds.min;
+    return simular(plano, valor, numParcelas);
+  }, [plano, entradaDigitada, bounds.min, numParcelas]);
 
   const oferta = getOfertaPadrao(plano);
   const ehEntradaMinima = Math.abs(resultado.entrada - bounds.min) < 0.01;
@@ -140,26 +148,52 @@ export default function Simulador() {
               A Prazo
             </div>
 
-            <label className="block mb-5">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Valor de entrada
-              </span>
-              <CurrencyInput
-                value={entradaInput}
-                onChange={setEntradaInput}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
-              />
-              <span className="text-xs text-gray-400">
-                Entre {formatBRL(bounds.min)} e {formatBRL(bounds.max)}
-              </span>
-            </label>
+            <div className="mb-5 flex gap-3">
+              <label className="block flex-1">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Valor de entrada
+                </span>
+                <CurrencyInput
+                  value={entradaInput}
+                  onChange={setEntradaInput}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+                />
+                {entradaAbaixoDoMinimo ? (
+                  <span className="text-xs font-semibold text-[#E8522A]">
+                    Mínimo é {formatBRL(bounds.min)} — usando o mínimo
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-400">
+                    Entre {formatBRL(bounds.min)} e {formatBRL(bounds.max)}
+                  </span>
+                )}
+              </label>
+
+              <label className="block w-24 shrink-0">
+                <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Parcelas
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={parcelasInput}
+                  onChange={(e) => setParcelasInput(e.target.value.replace(/\D/g, ""))}
+                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+                />
+                {parcelasAcimaDoMaximo ? (
+                  <span className="text-xs font-semibold text-[#E8522A]">Máx. {MAX_PARCELAS}x</span>
+                ) : (
+                  <span className="text-xs text-gray-400">Até {MAX_PARCELAS}x</span>
+                )}
+              </label>
+            </div>
 
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200">
               {!ehEntradaMinima && (
                 <InfoRow label="Desconto aplicado" value={formatBRL(resultado.desconto)} />
               )}
               <InfoRow
-                label="Parcela do restante (9x)"
+                label={`Parcela do restante (${numParcelas}x)`}
                 value={formatBRL(resultado.parcelaRestante)}
               />
               <InfoRow
