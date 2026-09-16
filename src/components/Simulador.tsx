@@ -41,7 +41,6 @@ export default function Simulador() {
   }
 
   const [pix, setPix] = useState<{ valor: number; cobranca: PixCobranca } | null>(null);
-  const [pixCopiado, setPixCopiado] = useState(false);
 
   useEffect(() => {
     if (step !== "pagamento" || pixValorParsed <= 0) return;
@@ -57,15 +56,11 @@ export default function Simulador() {
   const pixAtual = pix?.valor === pixValorParsed ? pix.cobranca : null;
   const pixCarregando = step === "pagamento" && !pixAtual;
 
-  async function copiarCodigoPix() {
-    if (!pixAtual) return;
-    await navigator.clipboard.writeText(pixAtual.brCode);
-    setPixCopiado(true);
-    setTimeout(() => setPixCopiado(false), 2000);
-  }
+  const naPagina = view === "simulador" && step === "pagamento";
 
   return (
-    <div className="w-full max-w-sm overflow-hidden rounded-[20px] shadow-[0_12px_48px_rgba(27,42,107,0.18)]">
+    <div className="w-full max-w-sm">
+    <div className="overflow-hidden rounded-[20px] shadow-[0_12px_48px_rgba(27,42,107,0.18)]">
       <div className="leading-none">
         <Image
           src="/images/banner.jpg"
@@ -173,76 +168,70 @@ export default function Simulador() {
           </>
         ) : (
           <>
-            <div className="flex justify-center mb-5 h-[220px] w-[220px] mx-auto items-center">
+            <label className="block mb-5">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+                Valor a cobrar
+              </span>
+              <CurrencyInput
+                value={pixValorInput}
+                onChange={setPixValorOverride}
+                className="mt-1 w-full rounded-lg border border-[#E8F0FE] px-3 py-2 text-lg font-bold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+              />
+            </label>
+
+            <div className="mb-5 flex items-center justify-center rounded-2xl border-[3px] border-[#E8522A] bg-white p-4">
               {pixAtual ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={pixAtual.qrCodeImage}
                   alt="QR code PIX"
-                  width={220}
-                  height={220}
-                  className="rounded-lg"
+                  width={230}
+                  height={230}
+                  className="block w-full max-w-[230px] rounded-md"
                 />
               ) : (
                 <Image
                   src="/images/qrcode.jpg"
                   alt="QR code PIX"
-                  width={220}
-                  height={220}
-                  className={`rounded-lg ${pixCarregando ? "opacity-40" : ""}`}
+                  width={230}
+                  height={230}
+                  className={`block w-full max-w-[230px] rounded-md ${pixCarregando ? "opacity-40" : ""}`}
                 />
               )}
             </div>
 
-            <label className="block mb-4">
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Valor a cobrar no PIX
-              </span>
-              <CurrencyInput
-                value={pixValorInput}
-                onChange={setPixValorOverride}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
-              />
-              <span className="text-xs text-gray-400">
-                Pode ajustar livremente — não precisa ser igual à entrada simulada
-              </span>
-            </label>
-
-            <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200 mb-5">
-              <InfoRow label="Chave PIX - CNPJ" value="34.295.555/0001-20" />
-              <InfoRow label="Beneficiário" value="Insider Mentoring" />
+            <div className="mb-2 overflow-hidden rounded-xl border-[1.5px] border-[#E8F0FE]">
+              <InfoRowOriginal label="Chave PIX — CNPJ" value="34.295.555/0001-20" />
+              <InfoRowOriginal label="Beneficiário" value="Insider Mentoring" borderTop />
             </div>
-
-            {pixAtual && (
-              <button
-                type="button"
-                onClick={copiarCodigoPix}
-                className="w-full rounded-full bg-[#1B2A6B] py-3 text-sm font-bold text-white mb-3"
-              >
-                {pixCopiado ? "Código copiado!" : "Copiar código PIX (copia e cola)"}
-              </button>
-            )}
-
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="h-2 w-2 rounded-full bg-[#E8522A]" />
-              <span className="text-sm font-semibold text-[#1B2A6B]">PIX Instantâneo</span>
-            </div>
-            <p className="text-center text-xs text-gray-400 mb-5">
-              Aponte a câmera
-              <br />
-              para o QR code
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setStep("calc")}
-              className="w-full rounded-full border border-[#1B2A6B]/20 py-3 text-sm font-semibold text-[#1B2A6B]"
-            >
-              Voltar ao simulador
-            </button>
           </>
         )}
       </div>
+
+      {naPagina && (
+        <div className="flex items-center justify-between bg-[#1B2A6B] px-6 py-4">
+          <div className="flex items-center gap-[7px] rounded-full bg-[#39C55E] px-[18px] py-[7px]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+            <span className="text-[13px] font-bold tracking-[0.06em] text-white">PIX Instantâneo</span>
+          </div>
+          <div className="text-right text-[10px] font-semibold uppercase leading-relaxed tracking-[0.07em] text-white/45">
+            Aponte a câmera
+            <br />
+            para o QR code
+          </div>
+        </div>
+      )}
+    </div>
+
+      {naPagina && (
+        <button
+          type="button"
+          onClick={() => setStep("calc")}
+          className="mt-4 w-full rounded-full border border-[#1B2A6B]/20 py-3 text-sm font-semibold text-[#1B2A6B]"
+        >
+          Voltar ao simulador
+        </button>
+      )}
     </div>
   );
 }
@@ -264,6 +253,28 @@ function InfoRow({
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function InfoRowOriginal({
+  label,
+  value,
+  borderTop,
+}: {
+  label: string;
+  value: string;
+  borderTop?: boolean;
+}) {
+  return (
+    <div className={`flex items-center px-4 py-3 ${borderTop ? "border-t-[1.5px] border-[#E8F0FE]" : ""}`}>
+      <div className="mr-[14px] h-9 w-1 flex-shrink-0 rounded-sm bg-[#E8522A]" />
+      <div>
+        <div className="mb-[3px] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+          {label}
+        </div>
+        <div className="text-[15px] font-bold text-[#1B2A6B]">{value}</div>
+      </div>
     </div>
   );
 }
