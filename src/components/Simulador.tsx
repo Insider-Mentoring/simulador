@@ -126,9 +126,14 @@ export default function Simulador() {
               ))}
             </div>
 
-            <div className="mb-5 flex items-center justify-between rounded-xl bg-[#f0f2f8] p-4">
-              <span className="text-sm text-gray-500">À vista</span>
-              <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
+            <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E8522A]">
+                Oferta na imersão — {PLANOS[plano].label}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">À vista</span>
+                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
+              </div>
             </div>
 
             <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
@@ -150,9 +155,6 @@ export default function Simulador() {
             </label>
 
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200">
-              {!ehEntradaMinima && (
-                <InfoRow label="Entrada considerada" value={formatBRL(resultado.entrada)} />
-              )}
               {!ehEntradaMinima && (
                 <InfoRow label="Desconto aplicado" value={formatBRL(resultado.desconto)} />
               )}
