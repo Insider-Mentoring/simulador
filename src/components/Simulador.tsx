@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { PLANOS, getBounds, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
+import { PLANOS, getBounds, getEntradaPadrao, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
@@ -20,7 +20,7 @@ export default function Simulador() {
   const [plano, setPlano] = useState<Plano>("individual");
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
   const bounds = getBounds(plano);
-  const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(bounds.min));
+  const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(getEntradaPadrao(plano)));
 
   const resultado = useMemo(() => {
     const valor = parseValor(entradaInput) || bounds.min;
@@ -31,7 +31,7 @@ export default function Simulador() {
 
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
-    setEntradaInput(numeroParaTextoBR(getBounds(novoPlano).min));
+    setEntradaInput(numeroParaTextoBR(getEntradaPadrao(novoPlano)));
   }
 
   const [pixValorOverride, setPixValorOverride] = useState<string | null>(null);
@@ -92,7 +92,7 @@ export default function Simulador() {
             )}
           </div>
           <div className="text-sm text-gray-500 mt-1">
-            {view === "calculadora" ? "Calculadora" : step === "calc" ? "Simulador de investimento" : "Pagamento"}
+            {view === "calculadora" ? "Calculadora" : step === "calc" ? "Desconto progressivo" : "Pagamento"}
           </div>
         </div>
 

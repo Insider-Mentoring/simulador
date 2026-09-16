@@ -207,6 +207,13 @@ export function getBounds(plano: Plano) {
   return { min: rows[0].entrada, max: rows[rows.length - 1].entrada };
 }
 
+// Primeiro valor de entrada depois da Oferta Padrao (a segunda linha da
+// tabela) - usado como valor padrao do campo de entrada no simulador.
+export function getEntradaPadrao(plano: Plano) {
+  const rows = PLANOS[plano].rows;
+  return rows[1]?.entrada ?? rows[0].entrada;
+}
+
 export type OfertaPadrao = {
   aVista: number;
   entradaMinima: number;
