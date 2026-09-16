@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
+import { PLANOS, getBounds, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
@@ -26,6 +26,8 @@ export default function Simulador() {
     const valor = parseValor(entradaInput) || bounds.min;
     return simular(plano, valor);
   }, [plano, entradaInput, bounds.min]);
+
+  const oferta = getOfertaPadrao(plano);
 
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
@@ -134,6 +136,22 @@ export default function Simulador() {
                   {PLANOS[opcao].label}
                 </button>
               ))}
+            </div>
+
+            <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+                Oferta padrão — {PLANOS[plano].label}
+              </div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-sm text-gray-500">À vista</span>
+                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Entrada + 9x</span>
+                <span className="text-sm font-bold text-[#1B2A6B]">
+                  {formatBRL(oferta.entradaMinima)} + 9x {formatBRL(oferta.parcelaMinima)}
+                </span>
+              </div>
             </div>
 
             <label className="block mb-5">

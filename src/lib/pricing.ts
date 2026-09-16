@@ -153,7 +153,9 @@ const DUPLA: Row[] = [
 ];
 
 const INDIVIDUAL: Row[] = [
-  { entrada: 2000, desconto: 348.83, remanescente: 44973 },
+  // R$2.000 e a "Oferta Padrao" (sem desconto de entrada, so valor cheio -
+  // entrada), igual ao minimo da Dupla/Trio.
+  { entrada: 2000, desconto: 0, remanescente: 44973 },
   { entrada: 3000, desconto: 523.24, remanescente: 43449.76 },
   { entrada: 4000, desconto: 697.65, remanescente: 42275.35 },
   { entrada: 5000, desconto: 872.07, remanescente: 41100.93 },
@@ -203,6 +205,26 @@ export const PLANOS: Record<Plano, { label: string; rows: Row[] }> = {
 export function getBounds(plano: Plano) {
   const rows = PLANOS[plano].rows;
   return { min: rows[0].entrada, max: rows[rows.length - 1].entrada };
+}
+
+export type OfertaPadrao = {
+  aVista: number;
+  entradaMinima: number;
+  parcelaMinima: number;
+};
+
+// Resumo rapido de cada plano: o valor a vista (ultima linha da tabela, com
+// o desconto maximo) e a entrada minima + parcela (primeira linha, sem
+// desconto de entrada) - os mesmos numeros da "Oferta Padrao" apresentada.
+export function getOfertaPadrao(plano: Plano): OfertaPadrao {
+  const rows = PLANOS[plano].rows;
+  const primeira = rows[0];
+  const ultima = rows[rows.length - 1];
+  return {
+    aVista: round2(ultima.entrada + ultima.remanescente),
+    entradaMinima: primeira.entrada,
+    parcelaMinima: round2(primeira.remanescente / 9),
+  };
 }
 
 // Percentual de desconto aplicado sobre a entrada, confirmado nas 3 tabelas
