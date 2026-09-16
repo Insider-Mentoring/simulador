@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { BASE_PATH } from "@/lib/basePath";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,6 +16,10 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "Insider Mentoring",
+  },
+  icons: {
+    icon: `${BASE_PATH}/icon-192.png`,
+    apple: `${BASE_PATH}/icon-192.png`,
   },
 };
 

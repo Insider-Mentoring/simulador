@@ -6,6 +6,7 @@ import { PLANOS, getBounds, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
+import { BASE_PATH } from "@/lib/basePath";
 
 const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -63,7 +64,7 @@ export default function Simulador() {
     <div className="overflow-hidden rounded-[20px] shadow-[0_12px_48px_rgba(27,42,107,0.18)]">
       <div className="leading-none">
         <Image
-          src="/images/banner.jpg"
+          src={`${BASE_PATH}/images/banner.jpg`}
           alt="Insider Mentoring"
           width={933}
           height={268}
@@ -191,7 +192,7 @@ export default function Simulador() {
                 />
               ) : (
                 <Image
-                  src="/images/qrcode.jpg"
+                  src={`${BASE_PATH}/images/qrcode.jpg`}
                   alt="QR code PIX"
                   width={230}
                   height={230}

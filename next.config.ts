@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
+const basePath = process.env.NEXT_PUBLIC_GITHUB_PAGES === "true" ? "/insider-mentoring-simulador" : "";
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export",
+  basePath,
+  assetPrefix: basePath,
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
