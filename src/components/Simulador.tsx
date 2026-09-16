@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { PLANOS, getBounds, getEntradaPadrao, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
+import { PLANOS, getBounds, getOfertaPadrao, simular, type Plano } from "@/lib/pricing";
 import { gerarPixCobranca, type PixCobranca } from "@/lib/pix";
 import Calculadora from "@/components/Calculadora";
 import CurrencyInput, { numeroParaTextoBR } from "@/components/CurrencyInput";
@@ -20,7 +20,7 @@ export default function Simulador() {
   const [plano, setPlano] = useState<Plano>("individual");
   const [step, setStep] = useState<"calc" | "pagamento">("calc");
   const bounds = getBounds(plano);
-  const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(getEntradaPadrao(plano)));
+  const [entradaInput, setEntradaInput] = useState(numeroParaTextoBR(bounds.min));
 
   const resultado = useMemo(() => {
     const valor = parseValor(entradaInput) || bounds.min;
@@ -28,10 +28,11 @@ export default function Simulador() {
   }, [plano, entradaInput, bounds.min]);
 
   const oferta = getOfertaPadrao(plano);
+  const ehEntradaMinima = Math.abs(resultado.entrada - bounds.min) < 0.01;
 
   function handlePlanoChange(novoPlano: Plano) {
     setPlano(novoPlano);
-    setEntradaInput(numeroParaTextoBR(getEntradaPadrao(novoPlano)));
+    setEntradaInput(numeroParaTextoBR(getBounds(novoPlano).min));
   }
 
   const [pixValorOverride, setPixValorOverride] = useState<string | null>(null);
@@ -125,25 +126,13 @@ export default function Simulador() {
               ))}
             </div>
 
-            <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
-              <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
-                Oferta na imersão — {PLANOS[plano].label}
-              </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-gray-500">À vista</span>
-                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
-              </div>
-              <div className="mt-2 border-t border-[#E8F0FE] pt-2">
-                <div className="mb-1 text-xs font-semibold text-gray-500">A Prazo</div>
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="text-sm text-gray-500">Entrada mínima</span>
-                  <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.entradaMinima)}</span>
-                </div>
-                <div className="flex items-center justify-between py-0.5">
-                  <span className="text-sm text-gray-500">9x de</span>
-                  <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.parcelaMinima)}</span>
-                </div>
-              </div>
+            <div className="mb-5 flex items-center justify-between rounded-xl bg-[#f0f2f8] p-4">
+              <span className="text-sm text-gray-500">À vista</span>
+              <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
+            </div>
+
+            <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+              A Prazo
             </div>
 
             <label className="block mb-5">
@@ -161,8 +150,12 @@ export default function Simulador() {
             </label>
 
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200">
-              <InfoRow label="Entrada considerada" value={formatBRL(resultado.entrada)} />
-              <InfoRow label="Desconto aplicado" value={formatBRL(resultado.desconto)} />
+              {!ehEntradaMinima && (
+                <InfoRow label="Entrada considerada" value={formatBRL(resultado.entrada)} />
+              )}
+              {!ehEntradaMinima && (
+                <InfoRow label="Desconto aplicado" value={formatBRL(resultado.desconto)} />
+              )}
               <InfoRow label="Valor remanescente" value={formatBRL(resultado.remanescente)} />
               <InfoRow
                 label="Parcela do restante (9x)"
