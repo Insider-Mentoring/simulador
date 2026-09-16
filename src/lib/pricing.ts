@@ -211,13 +211,20 @@ export type OfertaPadrao = {
   aVista: number;
 };
 
+// Arredondamento so de vitrine: o valor a vista mostrado na "Oferta na
+// Imersao" fica com final "97" para ficar mais redondo/facil de falar. Nao
+// muda a tabela por tras - quem simular a entrada maxima ve o valor exato.
+const A_VISTA_VITRINE: Partial<Record<Plano, number>> = {
+  dupla: 59997.0,
+};
+
 // Valor a vista de cada plano: a ultima linha da tabela, com o desconto
 // maximo (remanescente = 0, entao o total = a propria entrada).
 export function getOfertaPadrao(plano: Plano): OfertaPadrao {
   const rows = PLANOS[plano].rows;
   const ultima = rows[rows.length - 1];
   return {
-    aVista: round2(ultima.entrada + ultima.remanescente),
+    aVista: A_VISTA_VITRINE[plano] ?? round2(ultima.entrada + ultima.remanescente),
   };
 }
 
