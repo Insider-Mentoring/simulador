@@ -160,7 +160,7 @@ export default function Simulador() {
                 />
                 {entradaAbaixoDoMinimo ? (
                   <span className="text-xs font-semibold text-[#E8522A]">
-                    Mínimo é {formatBRL(bounds.min)} — usando o mínimo
+                    Entrada mínima de {formatBRL(bounds.min)}
                   </span>
                 ) : (
                   <span className="text-xs text-gray-400">
