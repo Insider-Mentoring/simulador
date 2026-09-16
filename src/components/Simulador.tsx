@@ -126,18 +126,20 @@ export default function Simulador() {
             </div>
 
             <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+              <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
                 Oferta na imersão — {PLANOS[plano].label}
               </div>
-              <div className="mb-1 flex items-center justify-between">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-gray-500">À vista</span>
                 <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.aVista)}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Entrada + 9x</span>
-                <span className="text-sm font-bold text-[#1B2A6B]">
-                  {formatBRL(oferta.entradaMinima)} + 9x {formatBRL(oferta.parcelaMinima)}
-                </span>
+              <div className="flex items-center justify-between py-1">
+                <span className="text-sm text-gray-500">Entrada</span>
+                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.entradaMinima)}</span>
+              </div>
+              <div className="flex items-center justify-between py-1">
+                <span className="text-sm text-gray-500">9x de</span>
+                <span className="text-sm font-bold text-[#1B2A6B]">{formatBRL(oferta.parcelaMinima)}</span>
               </div>
             </div>
 
