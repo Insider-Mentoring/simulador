@@ -267,16 +267,6 @@ export default function Simulador() {
         </div>
       )}
     </div>
-
-      {naPagina && (
-        <button
-          type="button"
-          onClick={() => setStep("calc")}
-          className="mt-4 w-full shrink-0 rounded-full border border-[#1B2A6B]/20 py-3 text-sm font-semibold text-[#1B2A6B]"
-        >
-          Voltar ao simulador
-        </button>
-      )}
     </div>
   );
 }
