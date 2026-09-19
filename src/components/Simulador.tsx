@@ -116,8 +116,8 @@ export default function Simulador() {
         {view === "calculadora" ? (
           <Calculadora />
         ) : step === "calc" ? (
-          <div className="flex flex-1 min-h-0 flex-col justify-between gap-4">
-            <div className="flex gap-2">
+          <div className="flex flex-1 min-h-0 flex-col">
+            <div className="flex gap-2 mb-4">
               {PLANO_OPTIONS.map((opcao) => (
                 <button
                   key={opcao}
@@ -134,7 +134,7 @@ export default function Simulador() {
               ))}
             </div>
 
-            <div className="rounded-xl bg-[#f0f2f8] p-3">
+            <div className="mb-4 rounded-xl bg-[#f0f2f8] p-3">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E8522A]">
                 Oferta na imersão — {PLANOS[plano].label}
               </div>
@@ -144,7 +144,7 @@ export default function Simulador() {
               </div>
             </div>
 
-            <div>
+            <div className="mb-4">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
                 A Prazo
               </div>
@@ -205,10 +205,12 @@ export default function Simulador() {
               />
             </div>
 
+            <div className="min-h-4 flex-1" />
+
             <button
               type="button"
               onClick={irParaPagamento}
-              className="w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
+              className="w-full shrink-0 py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
             >
               Gerar QR code PIX
             </button>
