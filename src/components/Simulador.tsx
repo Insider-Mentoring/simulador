@@ -84,8 +84,8 @@ export default function Simulador() {
         />
       </div>
 
-      <div className="flex flex-1 min-h-0 flex-col bg-white px-6 pb-6 pt-7 overflow-y-auto">
-        <div className="mb-5 shrink-0">
+      <div className="flex flex-1 min-h-0 flex-col bg-white px-6 pb-4 pt-5 overflow-y-auto">
+        <div className="mb-4 shrink-0">
           <div className="flex items-center justify-between">
             <div className="text-2xl font-extrabold leading-tight tracking-tight text-[#1B2A6B]">
               Insider <span className="text-[#E8522A]">Mentoring</span>
@@ -117,7 +117,7 @@ export default function Simulador() {
           <Calculadora />
         ) : step === "calc" ? (
           <>
-            <div className="flex gap-2 mb-5">
+            <div className="flex gap-2 mb-4">
               {PLANO_OPTIONS.map((opcao) => (
                 <button
                   key={opcao}
@@ -134,7 +134,7 @@ export default function Simulador() {
               ))}
             </div>
 
-            <div className="mb-5 rounded-xl bg-[#f0f2f8] p-4">
+            <div className="mb-4 rounded-xl bg-[#f0f2f8] p-3">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E8522A]">
                 Oferta na imersão — {PLANOS[plano].label}
               </div>
@@ -148,7 +148,7 @@ export default function Simulador() {
               A Prazo
             </div>
 
-            <div className="mb-5 flex gap-3">
+            <div className="mb-4 flex gap-3">
               <label className="block flex-1">
                 <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Valor de entrada
@@ -206,14 +206,14 @@ export default function Simulador() {
             <button
               type="button"
               onClick={irParaPagamento}
-              className="mt-5 w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
+              className="mt-4 w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
             >
               Gerar QR code PIX
             </button>
           </>
         ) : (
           <>
-            <label className="block mb-5">
+            <label className="block mb-4">
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
                 Valor a cobrar
               </span>
@@ -224,7 +224,7 @@ export default function Simulador() {
               />
             </label>
 
-            <div className="mb-5 flex items-center justify-center rounded-2xl border-[3px] border-[#E8522A] bg-white p-4">
+            <div className="mb-4 flex items-center justify-center rounded-2xl border-[3px] border-[#E8522A] bg-white p-4">
               {pixAtual ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -281,7 +281,7 @@ function InfoRow({
   destaque?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center justify-between px-4 py-2">
       <span className="text-xs text-gray-500">{label}</span>
       <span
         className={`text-sm font-semibold ${destaque ? "text-[#E8522A]" : "text-[#1B2A6B]"}`}
@@ -302,7 +302,7 @@ function InfoRowOriginal({
   borderTop?: boolean;
 }) {
   return (
-    <div className={`flex items-center px-4 py-3 ${borderTop ? "border-t-[1.5px] border-[#E8F0FE]" : ""}`}>
+    <div className={`flex items-center px-4 py-2 ${borderTop ? "border-t-[1.5px] border-[#E8F0FE]" : ""}`}>
       <div className="mr-[14px] h-9 w-1 flex-shrink-0 rounded-sm bg-[#E8522A]" />
       <div>
         <div className="mb-[3px] text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
