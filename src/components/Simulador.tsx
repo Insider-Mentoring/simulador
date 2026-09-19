@@ -157,7 +157,11 @@ export default function Simulador() {
                 <CurrencyInput
                   value={entradaInput}
                   onChange={setEntradaInput}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+                  className={`mt-1 w-full rounded-lg px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 ${
+                    entradaAbaixoDoMinimo
+                      ? "border-2 border-[#E8522A] bg-[#FDECE7] focus:ring-[#E8522A]/30"
+                      : "border border-gray-200 focus:ring-[#1B2A6B]/30"
+                  }`}
                 />
                 {entradaAbaixoDoMinimo ? (
                   <span className="text-xs font-semibold text-[#E8522A]">
@@ -179,7 +183,11 @@ export default function Simulador() {
                   inputMode="numeric"
                   value={parcelasInput}
                   onChange={(e) => setParcelasInput(e.target.value.replace(/\D/g, ""))}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 focus:ring-[#1B2A6B]/30"
+                  className={`mt-1 w-full rounded-lg px-3 py-2 text-lg font-semibold text-[#1B2A6B] focus:outline-none focus:ring-2 ${
+                    parcelasAcimaDoMaximo
+                      ? "border-2 border-[#E8522A] bg-[#FDECE7] focus:ring-[#E8522A]/30"
+                      : "border border-gray-200 focus:ring-[#1B2A6B]/30"
+                  }`}
                 />
                 {parcelasAcimaDoMaximo ? (
                   <span className="text-xs font-semibold text-[#E8522A]">Máx. {MAX_PARCELAS}x</span>
