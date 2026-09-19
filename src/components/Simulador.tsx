@@ -213,7 +213,7 @@ export default function Simulador() {
           </>
         ) : (
           <>
-            <label className="block mb-4">
+            <label className="block mb-4 shrink-0">
               <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
                 Valor a cobrar
               </span>
@@ -224,7 +224,7 @@ export default function Simulador() {
               />
             </label>
 
-            <div className="mb-4 flex items-center justify-center rounded-2xl border-[3px] border-[#E8522A] bg-white p-4">
+            <div className="mb-4 flex flex-1 min-h-0 items-center justify-center rounded-2xl border-[3px] border-[#E8522A] bg-white p-3">
               {pixAtual ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -232,7 +232,7 @@ export default function Simulador() {
                   alt="QR code PIX"
                   width={230}
                   height={230}
-                  className="block w-full max-w-[230px] rounded-md"
+                  className="block h-auto max-h-full w-auto max-w-full rounded-md object-contain"
                 />
               ) : (
                 <Image
@@ -240,12 +240,12 @@ export default function Simulador() {
                   alt="QR code PIX"
                   width={230}
                   height={230}
-                  className={`block w-full max-w-[230px] rounded-md ${pixCarregando ? "opacity-40" : ""}`}
+                  className={`block h-auto max-h-full w-auto max-w-full rounded-md object-contain ${pixCarregando ? "opacity-40" : ""}`}
                 />
               )}
             </div>
 
-            <div className="mb-2 overflow-hidden rounded-xl border-[1.5px] border-[#E8F0FE]">
+            <div className="mb-2 shrink-0 overflow-hidden rounded-xl border-[1.5px] border-[#E8F0FE]">
               <InfoRowOriginal label="Chave PIX — CNPJ" value="34.295.555/0001-20" />
               <InfoRowOriginal label="Beneficiário" value="Insider Mentoring" borderTop />
             </div>
