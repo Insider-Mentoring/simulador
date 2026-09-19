@@ -116,8 +116,8 @@ export default function Simulador() {
         {view === "calculadora" ? (
           <Calculadora />
         ) : step === "calc" ? (
-          <>
-            <div className="flex gap-2 mb-4">
+          <div className="flex flex-1 min-h-0 flex-col justify-between gap-4">
+            <div className="flex gap-2">
               {PLANO_OPTIONS.map((opcao) => (
                 <button
                   key={opcao}
@@ -134,7 +134,7 @@ export default function Simulador() {
               ))}
             </div>
 
-            <div className="mb-4 rounded-xl bg-[#f0f2f8] p-3">
+            <div className="rounded-xl bg-[#f0f2f8] p-3">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#E8522A]">
                 Oferta na imersão — {PLANOS[plano].label}
               </div>
@@ -144,11 +144,12 @@ export default function Simulador() {
               </div>
             </div>
 
-            <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
-              A Prazo
-            </div>
+            <div>
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#8B95B8]">
+                A Prazo
+              </div>
 
-            <div className="mb-4 flex gap-3">
+              <div className="flex gap-3">
               <label className="block flex-1">
                 <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Valor de entrada
@@ -186,6 +187,7 @@ export default function Simulador() {
                   <span className="text-xs text-gray-400">Até {MAX_PARCELAS}x</span>
                 )}
               </label>
+              </div>
             </div>
 
             <div className="rounded-xl bg-[#f7f8fc] divide-y divide-gray-200">
@@ -206,11 +208,11 @@ export default function Simulador() {
             <button
               type="button"
               onClick={irParaPagamento}
-              className="mt-4 w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
+              className="w-full py-2 text-center text-sm font-medium text-[#1B2A6B] underline decoration-[#1B2A6B]/30 underline-offset-4"
             >
               Gerar QR code PIX
             </button>
-          </>
+          </div>
         ) : (
           <>
             <label className="block mb-4 shrink-0">
