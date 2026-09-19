@@ -334,21 +334,22 @@ export default function Calculadora() {
   const linhaPequena = editandoNumero && resultado === null ? tokensExibidos.slice(0, -1) : tokensExibidos;
   const numeroGrande = resultado !== null ? resultado : valorAtualExibido(tokens);
 
-  const botaoBase = "rounded-xl py-4 text-lg font-semibold transition-colors";
+  const botaoBase =
+    "flex items-center justify-center rounded-xl text-lg font-semibold transition-colors";
   const botaoNumero = `${botaoBase} bg-[#f0f2f8] text-[#1B2A6B] hover:bg-[#e4e7f2]`;
   const botaoOperador = `${botaoBase} bg-[#1B2A6B] text-white hover:bg-[#152057]`;
   const botaoAcao = `${botaoBase} bg-gray-200 text-[#1B2A6B] hover:bg-gray-300`;
 
   return (
-    <div>
-      <div className="mb-4 rounded-xl bg-[#f7f8fc] px-4 py-5 text-right">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="mb-4 shrink-0 rounded-xl bg-[#f7f8fc] px-4 py-5 text-right">
         <div className="h-5 truncate text-sm text-gray-400">
           {linhaPequena.map((t) => (ehSimbolo(t) ? t : formatarNumeroToken(t))).join(" ")}
         </div>
         <div className="truncate text-3xl font-bold text-[#1B2A6B]">{numeroGrande}</div>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid min-h-0 flex-1 grid-cols-4 grid-rows-[repeat(7,minmax(0,1fr))] gap-2">
         <button type="button" onClick={abrirParenteses} className={`${botaoAcao} col-span-2`}>
           (
         </button>

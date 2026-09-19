@@ -71,9 +71,9 @@ export default function Simulador() {
   const naPagina = view === "simulador" && step === "pagamento";
 
   return (
-    <div className="w-full max-w-sm">
-    <div className="overflow-hidden rounded-[20px] shadow-[0_12px_48px_rgba(27,42,107,0.18)]">
-      <div className="leading-none">
+    <div className="flex w-full min-h-0 flex-col sm:w-full sm:max-w-sm">
+    <div className="flex flex-1 min-h-0 flex-col overflow-hidden sm:rounded-[20px] sm:shadow-[0_12px_48px_rgba(27,42,107,0.18)]">
+      <div className="shrink-0 leading-none">
         <Image
           src={`${BASE_PATH}/images/banner.jpg`}
           alt="Insider Mentoring"
@@ -84,8 +84,8 @@ export default function Simulador() {
         />
       </div>
 
-      <div className="bg-white px-6 pb-6 pt-7">
-        <div className="mb-5">
+      <div className="flex flex-1 min-h-0 flex-col bg-white px-6 pb-6 pt-7 overflow-y-auto">
+        <div className="mb-5 shrink-0">
           <div className="flex items-center justify-between">
             <div className="text-2xl font-extrabold leading-tight tracking-tight text-[#1B2A6B]">
               Insider <span className="text-[#E8522A]">Mentoring</span>
@@ -254,7 +254,7 @@ export default function Simulador() {
       </div>
 
       {naPagina && (
-        <div className="flex items-center justify-between bg-[#1B2A6B] px-6 py-4">
+        <div className="flex shrink-0 items-center justify-between bg-[#1B2A6B] px-6 py-4">
           <div className="flex items-center gap-[7px] rounded-full bg-[#39C55E] px-[18px] py-[7px]">
             <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
             <span className="text-[13px] font-bold tracking-[0.06em] text-white">PIX Instantâneo</span>
@@ -272,7 +272,7 @@ export default function Simulador() {
         <button
           type="button"
           onClick={() => setStep("calc")}
-          className="mt-4 w-full rounded-full border border-[#1B2A6B]/20 py-3 text-sm font-semibold text-[#1B2A6B]"
+          className="mt-4 w-full shrink-0 rounded-full border border-[#1B2A6B]/20 py-3 text-sm font-semibold text-[#1B2A6B]"
         >
           Voltar ao simulador
         </button>
